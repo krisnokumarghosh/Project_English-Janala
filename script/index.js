@@ -1,3 +1,21 @@
+const creatElements = (arr) =>{
+    const htmlElem = arr.map((el) => `<span class="btn bg-[#EDF7FF]">${el}</span>`);
+    return(htmlElem.join(" "));
+    
+}
+
+
+const manageSpinner = (status) => {
+    if(status == true){
+        document.getElementById('spinner').classList.remove('hidden');
+        document.getElementById('word-container').classList.add('hidden');
+    }else{
+        document.getElementById('spinner').classList.add('hidden');
+        document.getElementById('word-container').classList.remove('hidden');
+    }
+}
+
+
 
 const loadLessons = () =>{
     fetch("https://openapi.programming-hero.com/api/levels/all")
@@ -12,6 +30,7 @@ const removeActive = () => {
 }
 
 const loadLevelWord = (id) =>{
+    manageSpinner(true);
     const url = `https://openapi.programming-hero.com/api/level/${id}`;
     fetch(url)
     .then((res) => res.json())
@@ -22,6 +41,45 @@ const loadLevelWord = (id) =>{
 
         displayLevelWord(data.data);
     } ) 
+}
+
+
+const loadWorsDetail = async (id) => {
+    const url = `https://openapi.programming-hero.com/api/word/${id}`
+    const res = await fetch(url);
+    const details = await res.json();
+    displayWorsDetail(details.data);
+}
+
+
+const displayWorsDetail = (word) => {
+    console.log(word);
+
+    const detailsContainer = document.getElementById('details-container');
+    detailsContainer.innerHTML = `
+    
+        <div class="mb-[25px]">
+        <h2 class="text-[26px] font-semibold font-bangla"> ${word.word} (<i class="fa-solid fa-microphone-lines"></i>:${word.pronunciation})</h2>
+      </div>
+      <div class="space-y-[10px] mb-[25px]">
+        <h2 class="text-[20px] font-semibold">Meaning</h2>
+        <p class="font-medium text-[18px] font-bangla">${word.meaning}</p>
+      </div>
+      <div class="space-y-[10px] mb-[25px]">
+        <h2 class="text-[20px] font-semibold">Example</h2>
+        <p class="text-[18px] ">${word.sentence}</p>
+      </div>
+      <div class="space-y-[10px] mb-[25px] ">
+        <h2 class="text-[20px] font-semibold font-bangla">সমার্থক শব্দ গুলো</h2>
+        <div class=" flex items-center gap-[8px]">
+        ${creatElements(word.synonyms)}
+        </div>
+      </div>
+      
+
+    `;
+
+    document.getElementById("word_modal").showModal();
 }
 
 
@@ -40,12 +98,13 @@ const displayLevelWord = (words) =>{
         </div>
         
         `
+        manageSpinner(false);
 
         return;
     }
 
     words.forEach((word) =>{
-        console.log(word);
+        // console.log(word);
         const card = document.createElement("div");
         card.innerHTML = `
         
@@ -56,7 +115,7 @@ const displayLevelWord = (words) =>{
             <div class="font-bangla font-semibold text-[20px] text-[#18181B]">"${word.pronunciation ? word.pronunciation : 'শব্দ পাওয়া যায়নি'} / ${word.meaning ? word.meaning : 'অর্থ পাওয়া যায়নি'}"</div>
           </div>
             <div class="flex justify-between items-center">
-                <button class="btn btn-soft btn-info"><i class="fa-solid fa-circle-info"></i></button>
+                <button onclick="loadWorsDetail(${word.id})" class="btn btn-soft btn-info"><i class="fa-solid fa-circle-info"></i></button>
                 <button class="btn btn-soft btn-info"><i class="fa-solid fa-volume-high"></i></button>
             </div>
         </div>
@@ -64,6 +123,8 @@ const displayLevelWord = (words) =>{
         `
 
         wordContainer.append(card);
+
+        manageSpinner(false);
         
     })
     
