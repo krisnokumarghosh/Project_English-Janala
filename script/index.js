@@ -4,6 +4,12 @@ const creatElements = (arr) =>{
     
 }
 
+function pronounceWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-EN"; // English
+  window.speechSynthesis.speak(utterance);
+}
+
 
 const manageSpinner = (status) => {
     if(status == true){
@@ -116,7 +122,7 @@ const displayLevelWord = (words) =>{
           </div>
             <div class="flex justify-between items-center">
                 <button onclick="loadWorsDetail(${word.id})" class="btn btn-soft btn-info"><i class="fa-solid fa-circle-info"></i></button>
-                <button class="btn btn-soft btn-info"><i class="fa-solid fa-volume-high"></i></button>
+                <button onclick="pronounceWord('${word.word}')" class="btn btn-soft btn-info"><i class="fa-solid fa-volume-high"></i></button>
             </div>
         </div>
 
